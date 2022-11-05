@@ -1,0 +1,12 @@
+[tool.mypy]
+python_version = "3.8"
+# warn_return_any = true
+ignore_missing_imports = true
+check_untyped_defs = true
+ignore_missing_imports_per_module = true
+warn_unused_configs = true
+exclude = [
+    "venv/*",
+    'template/*',  # TOML literal string (single-quotes, no escaping necessary)
+    "setup.py",  # TOML basic string (double-quotes, backslash and other characters need escaping)
+]
