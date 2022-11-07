@@ -1,2 +1,3 @@
+
 global-include  *.pyi
-recursive-include pytransform
+recursive-include */pytransform *
