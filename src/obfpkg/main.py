@@ -1,18 +1,16 @@
 import argparse
-from os import PathLike, path, mkdir
+from os import mkdir
 from pathlib import Path
-from typing import Any, Dict, Union
 import tempfile
 
-from stubs import StubsGenerator
-from pkg import PackageGenerator
-from obfs import ObfusGenerator
-
 try:
+    # package style import
+    from .core import Package, Stubs, Obfuscate
     from .utils import PathType, PathCheck, Exist
 except ImportError:
+    # project style import
+    from core import Package, Stubs, Obfuscate  # type: ignore
     from utils import PathType, PathCheck, Exist  # type: ignore
-
 
 STUBS_PACKAGE_DIR_NAME = "stubs-pkg"
 MANIFEST_FILE_NAME = "MANIFEST.in"
@@ -69,14 +67,14 @@ def get_package_name(src: Path):
     return package
 
 
-def rewriter(path):
+def rewriter(path: Path):
     lines = [
         "\nglobal-include  *.pyi",  # important for stubs package",
         "\nrecursive-include */pytransform *",  # important for obfuscate package",
     ]
     must_write_lines = []
     try:
-        with open(path, "r") as f:
+        with open(path.resolve(), "r") as f:
             content = f.read()
             for line in lines:
                 if line.strip() not in content:
@@ -89,74 +87,93 @@ def rewriter(path):
             f.writelines(must_write_lines)
 
 
-def recreate_manifest(src: Path, stubs_pkg_dir: Union[PathLike, str]):
-    rewriter(path.join(src, MANIFEST_FILE_NAME))
-    rewriter(path.join(src.parent / stubs_pkg_dir, MANIFEST_FILE_NAME))
+def recreate_manifest(src: Path, stubs_build_path: Path):
+    for path in [src, stubs_build_path]:
+        rewriter(path.joinpath(MANIFEST_FILE_NAME))
 
 
-def create_stubs_package(src: Path, build_path: Path, output_dir: Path, package_name: str):
-    stubs_generator = StubsGenerator(
-        src=src,
+def create_stubs_package(
+    src: Path,
+    build_path: Path,
+    output_dir: Path,
+    package_name: str,
+    verbose: bool = False,
+):
+    stubs_generator = Stubs(
+        src_path=src,
         build_path=build_path,
         package_name=package_name,
+        verbose=verbose,
     )
     stubs_generator.generate()
 
     # Start Build Package
-    package_generator = PackageGenerator(
-        src=build_path,
-        destination=output_dir,
+    package_generator = Package(
+        build_path=build_path,
+        output_path=output_dir,
+        verbose=verbose,
     )
-    package_generator.generate()
+    package_generator.build()
     package_generator.move_to_output()
 
     stubs_generator.clean_up()
 
 
-def create_obfuscated_package(src: Path, output_dir: Path, package_name: str):
+def create_obfuscated_package(
+    src: Path, output_dir: Path, package_name: str, verbose: bool = False
+):
     with tempfile.TemporaryDirectory(prefix="obf-pkg-", dir=src.parent) as tempdir:
-        print("Start Process in:", tempdir)
+        print("###  Start Process in:", tempdir)
 
-        obf_pkg = ObfusGenerator(src, Path(tempdir), package_name)
-        obf_pkg.generate()
+        obf_pkg = Obfuscate(src, Path(tempdir), package_name, verbose=verbose)
+        obf_pkg.build()
 
         # Start Build Package
-        package_generator = PackageGenerator(
-            src=Path(tempdir).joinpath("dist"),
-            destination=output_dir,
+        package_generator = Package(
+            build_path=Path(tempdir).joinpath("dist"),
+            output_path=output_dir,
+            verbose=verbose,
         )
-        package_generator.generate()
+        package_generator.build()
         package_generator.move_to_output()
 
 
 def main():
     args = get_args().parse_args()
-    print(args)
     package_name = get_package_name(args.src)
-    recreate_manifest(args.src, STUBS_PACKAGE_DIR_NAME)
 
+    for k, v in vars(args).items():
+        print(f"{k:>15}: {v!r:<20}")
+    print()
+
+    stubs_build_path = (
+        args.src / f"../{STUBS_PACKAGE_DIR_NAME}"
+        if args.stubs_dir is None
+        else args.stubs_dir
+    )
     if args.output_dir is None:
-        args.output_dir = args.src / f"../dist"
+        args.output_dir = (args.src / f"../dist").resolve()
     try:
         mkdir(args.output_dir)
     except FileExistsError:
         pass
 
-    build_path = (
-        args.src / f"../{STUBS_PACKAGE_DIR_NAME}"
-        if args.stubs_dir is None
-        else args.stubs_dir
-    )
-    PathCheck(exists=Exist(check=True), ptype=PathType.DIR)(build_path)
+    recreate_manifest(args.src, stubs_build_path)
+
+    PathCheck(exists=Exist(check=True), ptype=PathType.DIR)(stubs_build_path)
     create_stubs_package(
         src=args.src,
-        build_path=build_path,
+        build_path=stubs_build_path,
         output_dir=args.output_dir,
         package_name=package_name,
+        verbose=args.verbose,
     )
 
     create_obfuscated_package(
-        src=args.src, output_dir=args.output_dir, package_name=package_name
+        src=args.src,
+        output_dir=args.output_dir,
+        package_name=package_name,
+        verbose=args.verbose,
     )
 
 
