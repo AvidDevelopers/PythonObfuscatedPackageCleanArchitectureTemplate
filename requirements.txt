@@ -1,1 +1,3 @@
-pyarmor==6.8.1
+pyarmor==6.6.2
+mypy==0.982
+wheel
