@@ -69,7 +69,7 @@ class PathCheck:
         self._type = ptype
         self._dash_ok = dash_ok
 
-    def __call__(self, string: str):
+    def __call__(self, string: str) -> Path:
         path_item = Path(string)
         if path_item == Path("-"):
             # the special argument "-" means sys.std[in/out]
@@ -83,7 +83,7 @@ class PathCheck:
                 )
             elif not self._dash_ok:
                 raise ArgumentTypeError("standard input/output (-) not allowed")
-            return string  # No reason to check anything else if this works.
+            return path_item  # No reason to check anything else if this works.
 
         # If the path must exist.
         if self._exists.check:
