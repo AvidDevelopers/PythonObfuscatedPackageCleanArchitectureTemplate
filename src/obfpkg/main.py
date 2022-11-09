@@ -47,7 +47,7 @@ def get_args() -> argparse.ArgumentParser:
         "--stubs-dir",
         metavar="stubs_pkg_dir",
         type=PathCheck(exists=Exist(check=True), ptype=PathType.DIR),
-        help=f"The directory of stubs package project (needed 'setup.py' for build pkg-stubs). default is: <src>/../{STUBS_PACKAGE_DIR_NAME}",
+        help="The directory of stubs package project (needed 'setup.py' for build pkg-stubs).",
     )
 
     return parser
@@ -67,7 +67,7 @@ def get_package_name(src: Path):
     return package
 
 
-def rewriter(path: Path):
+def rewrite_manifest(path: Path):
     lines = [
         "\nglobal-include  *.pyi",  # important for stubs package",
         "\nrecursive-include */pytransform *",  # important for obfuscate package",
@@ -85,11 +85,6 @@ def rewriter(path: Path):
     if must_write_lines:
         with open(path, "a") as f:
             f.writelines(must_write_lines)
-
-
-def recreate_manifest(src: Path, stubs_build_path: Path):
-    for path in [src, stubs_build_path]:
-        rewriter(path.joinpath(MANIFEST_FILE_NAME))
 
 
 def create_stubs_package(
@@ -146,11 +141,6 @@ def main():
         print(f"{k:>15}: {v!r:<20}")
     print()
 
-    stubs_build_path = (
-        args.src / f"../{STUBS_PACKAGE_DIR_NAME}"
-        if args.stubs_dir is None
-        else args.stubs_dir
-    )
     if args.output_dir is None:
         args.output_dir = (args.src / f"../dist").resolve()
     try:
@@ -158,16 +148,19 @@ def main():
     except FileExistsError:
         pass
 
-    recreate_manifest(args.src, stubs_build_path)
+    if args.stubs_dir:
+        stubs_build_path = args.stubs_dir.resolve()
+        PathCheck(exists=Exist(check=True), ptype=PathType.DIR)(stubs_build_path)
+        rewrite_manifest(stubs_build_path.joinpath(MANIFEST_FILE_NAME))
+        create_stubs_package(
+            src=args.src,
+            build_path=stubs_build_path,
+            output_dir=args.output_dir,
+            package_name=package_name,
+            verbose=args.verbose,
+        )
 
-    PathCheck(exists=Exist(check=True), ptype=PathType.DIR)(stubs_build_path)
-    create_stubs_package(
-        src=args.src,
-        build_path=stubs_build_path,
-        output_dir=args.output_dir,
-        package_name=package_name,
-        verbose=args.verbose,
-    )
+    rewrite_manifest(args.src.joinpath(MANIFEST_FILE_NAME))
 
     create_obfuscated_package(
         src=args.src,
