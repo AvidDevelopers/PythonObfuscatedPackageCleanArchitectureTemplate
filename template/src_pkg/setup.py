@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup, find_namespace_packages
 
 version = "0.1.0"
 DESCRIPTION = "A print package"
@@ -13,10 +13,7 @@ setup(
     author="Sadegh Yazdani",
     author_email="m.s.yazdani85@gmail.com",
     license="GPLv3",
-    project_urls={
-        "Source Code": "https://github.com/aerosadegh/komet/",
-    },
-    packages=find_packages(),
+    packages=find_namespace_packages(),
     include_package_data=True,  # Importants
     install_requires=[],
     keywords="printing",
@@ -26,12 +23,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
     ],
-    python_requires=">=3.8,<3.11",
+    python_requires="~=3.8",
 )
