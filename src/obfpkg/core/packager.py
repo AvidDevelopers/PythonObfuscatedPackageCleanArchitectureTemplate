@@ -11,15 +11,25 @@ class Package:
         self.output_path = output_path
         self.verbose = verbose
 
-    def build(self):
+    def build(self, with_version=False):
+        version = (
+            [
+                "--python-tag",
+                f"cp{sys.version_info.major}{sys.version_info.minor}",
+            ]
+            if with_version
+            else []
+        )
         process = Popen(
             [
                 sys.executable,
                 "setup.py",
+                "build",
                 "bdist_wheel",
                 "--dist-dir",
                 "whl",
-            ],
+            ]
+            + version,
             cwd=f"{self.build_path}",
             stdout=PIPE,
             stderr=PIPE,

@@ -129,7 +129,7 @@ def create_obfuscated_package(
             output_path=output_dir,
             verbose=verbose,
         )
-        package_generator.build()
+        package_generator.build(with_version=True)
         package_generator.move_to_output()
 
 
