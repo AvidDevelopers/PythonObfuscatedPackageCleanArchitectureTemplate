@@ -101,6 +101,11 @@ def create_stubs_package(
         verbose=verbose,
     )
     stubs_generator.generate()
+    try:
+        stubs_generator.overwrite_stubs_from_src()  # TODO: not implemented yet
+    except NotImplementedError:
+        print("WARNNING: `stubs_generator.overwrite_stubs_from_src` NOT IMPLEMENTED YET!")
+        pass
 
     # Start Build Package
     package_generator = Package(

@@ -63,6 +63,7 @@ class Stubs:
         return stdout, stderr
 
     def overwrite_stubs_from_src(self):
+
         raise NotImplementedError
 
     def clean_up(self):
