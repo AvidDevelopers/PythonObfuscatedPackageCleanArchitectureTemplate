@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages, find_namespace_packages
-
+from setuptools import find_namespace_packages, find_packages, setup
 
 # Collect package from src_pkg Automatically
 packages = find_namespace_packages(".")

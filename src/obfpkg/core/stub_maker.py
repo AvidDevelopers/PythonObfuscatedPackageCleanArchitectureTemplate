@@ -1,5 +1,8 @@
-from os import rename, listdir
+import shutil
+from os import listdir, rename
 from pathlib import Path
+from subprocess import PIPE, Popen
+
 from utils import remove_intersection_path
 
 STUBS_PACKAGE_DIR_NAME = "stubs-pkg"
@@ -64,7 +67,7 @@ class Stubs:
         except NotImplementedError:
             print("WARNNING: `overwrite_stubs_from_src` NOT IMPLEMENTED YET!")
             pass
-            self._rename()
+        self._rename()
 
         return stdout, stderr
 

@@ -1,4 +1,4 @@
-from setuptools import setup, find_namespace_packages
+from setuptools import find_namespace_packages, setup
 
 version = "0.1.0"
 DESCRIPTION = "A print package"

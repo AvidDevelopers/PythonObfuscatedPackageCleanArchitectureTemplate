@@ -1,16 +1,16 @@
 import argparse
+import tempfile
 from os import mkdir
 from pathlib import Path
-import tempfile
 
 try:
     # package style import
-    from .core import Package, Stubs, Obfuscate
-    from .utils import PathType, PathCheck, Exist
+    from .core import Obfuscate, Package, Stubs
+    from .utils import Exist, PathCheck, PathType
 except ImportError:
     # project style import
-    from core import Package, Stubs, Obfuscate  # type: ignore
-    from utils import PathType, PathCheck, Exist  # type: ignore
+    from core import Obfuscate, Package, Stubs  # type: ignore
+    from utils import Exist, PathCheck, PathType  # type: ignore
 
 STUBS_PACKAGE_DIR_NAME = "stubs-pkg"
 MANIFEST_FILE_NAME = "MANIFEST.in"
