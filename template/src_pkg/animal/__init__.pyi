@@ -4,6 +4,6 @@ __all__ = [
     "sample_animal",
 ]
 
+from . import sample_animal
 from .horse import Horse
 from .mammalian import Mammal
-from . import sample_animal

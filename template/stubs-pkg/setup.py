@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-import os
-from setuptools import setup, find_packages, find_namespace_packages
-
+from setuptools import find_namespace_packages, find_packages, setup
 
 # Collect package from src_pkg Automatically
-packages_name = find_namespace_packages(".")[0]
+packages = find_namespace_packages(".")
+packages_name = packages[0]
 original_package_name, _, _ = packages_name.partition("-")
 
 
@@ -19,7 +18,7 @@ setup(
     author="Sadegh Yazdani",
     author_email="m.s.yazdani85@gmail.com",
     license="GPLv3",
-    packages=[x for x in find_namespace_packages() if os.path.isdir(x)],
+    packages=[x for x in packages],
     include_package_data=True,  # Important
     install_requires=[],
     classifiers=[

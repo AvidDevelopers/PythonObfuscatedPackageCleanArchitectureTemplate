@@ -1,7 +1,9 @@
 __all__ = [
+    "Exist",
     "PathCheck",
     "PathType",
-    "Exist",
+    "remove_intersection_path",
 ]
 
-from .structs import PathCheck, PathType, Exist
+from .functions import remove_intersection_path
+from .structs import Exist, PathCheck, PathType
