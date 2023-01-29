@@ -12,7 +12,7 @@ except ImportError:
     from core import Obfuscate, Package, Stubs  # type: ignore
     from utils import Exist, PathCheck, PathType  # type: ignore
 
-STUBS_PACKAGE_DIR_NAME = "stubs-pkg"
+
 MANIFEST_FILE_NAME = "MANIFEST.in"
 
 

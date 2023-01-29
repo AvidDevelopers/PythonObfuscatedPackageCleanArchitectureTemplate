@@ -5,8 +5,6 @@ from subprocess import PIPE, Popen
 
 from utils import remove_intersection_path
 
-STUBS_PACKAGE_DIR_NAME = "stubs-pkg"
-
 
 class Stubs:
     """Generate the stubs project files from the source project."""
