@@ -21,6 +21,11 @@ class Stubs:
 
         self.clean_up()
 
+    def __log(self, items):
+        if items and self.verbose:
+            for item in items:
+                print(f"The {item!r} overwrited from source project to stubs ")
+
     def __rename(self):
         for i in range(3, 0, -1):
             try:
@@ -59,16 +64,24 @@ class Stubs:
             raise Exception(
                 f"Error while generating stubs: {stderr.decode('utf-8')}\n\nSTDOUT:\n{stdout.decode('utf-8')}"
             )
+
+        overwrited_pyi_files = self.overwrite_stubs_from_src()
+        self.__log(overwrited_pyi_files)
         self.__rename()
 
         return stdout, stderr
 
+    def __copy(self, items, src: Path, dest: Path):
+        for item in items:
+            shutil.copy(src / item, dest / item)
+
     def overwrite_stubs_from_src(self):
         pyi_files = self.src_path.glob("*/*.pyi")
-        pure_pypi_paths = [remove_intersection_path(self.src_path, item) for item in pyi_files]
+        pure_pypi_paths = [
+            remove_intersection_path(self.src_path, item) for item in pyi_files
+        ]
+        self.__copy(pure_pypi_paths, self.src_path, self.build_path)
 
-        for item in pure_pypi_paths:
-            shutil.copy(self.src_path / item, self.build_path / item)
         return pure_pypi_paths
 
     def clean_up(self):
