@@ -21,7 +21,7 @@ class Stubs:
 
         self.clean_up()
 
-    def _rename(self):
+    def __rename(self):
         for i in range(3, 0, -1):
             try:
                 rename(
@@ -59,15 +59,7 @@ class Stubs:
             raise Exception(
                 f"Error while generating stubs: {stderr.decode('utf-8')}\n\nSTDOUT:\n{stdout.decode('utf-8')}"
             )
-        try:
-            overwrited_pyi_files = self.overwrite_stubs_from_src()
-            if overwrited_pyi_files and self.verbose:
-                for item in overwrited_pyi_files:
-                    print(f"The {item!r} overwrited from source project to stubs ")
-        except NotImplementedError:
-            print("WARNNING: `overwrite_stubs_from_src` NOT IMPLEMENTED YET!")
-            pass
-        self._rename()
+        self.__rename()
 
         return stdout, stderr
 
