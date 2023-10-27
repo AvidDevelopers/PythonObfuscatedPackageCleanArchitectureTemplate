@@ -1,10 +1,10 @@
-from os import listdir
 import shutil
-from pathlib import Path
-from typing import Optional, Union, Tuple, List, Callable
-from dataclasses import dataclass
 from argparse import ArgumentTypeError
+from dataclasses import dataclass
 from enum import Enum
+from os import listdir
+from pathlib import Path
+from typing import Callable, List, Optional, Tuple, Union
 
 
 @dataclass

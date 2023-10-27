@@ -1,9 +1,9 @@
-from os import rename, listdir
-from pathlib import Path
-from subprocess import Popen, PIPE
 import shutil
+from os import listdir, rename
+from pathlib import Path
+from subprocess import PIPE, Popen
 
-STUBS_PACKAGE_DIR_NAME = "stubs-pkg"
+from utils import remove_intersection_path
 
 
 class Stubs:
@@ -12,14 +12,19 @@ class Stubs:
     def __init__(
         self, src_path: Path, build_path: Path, package_name: str, verbose: bool = False
     ):
-        self.src_path = src_path
+        self.src_path = src_path.resolve()
         self.build_path = build_path.resolve()
         self.package_name = package_name
         self.verbose = verbose
 
         self.clean_up()
 
-    def _rename(self):
+    def __log(self, items):
+        if items and self.verbose:
+            for item in items:
+                print(f"The {item!r} overwrited from source project to stubs ")
+
+    def __rename(self):
         for i in range(3, 0, -1):
             try:
                 rename(
@@ -57,13 +62,25 @@ class Stubs:
             raise Exception(
                 f"Error while generating stubs: {stderr.decode('utf-8')}\n\nSTDOUT:\n{stdout.decode('utf-8')}"
             )
-        else:
-            self._rename()
+
+        overwrited_pyi_files = self.overwrite_stubs_from_src()
+        self.__log(overwrited_pyi_files)
+        self.__rename()
 
         return stdout, stderr
 
+    def __copy(self, items, src: Path, dest: Path):
+        for item in items:
+            shutil.copy(src / item, dest / item)
+
     def overwrite_stubs_from_src(self):
-        raise NotImplementedError
+        pyi_files = self.src_path.glob("*/*.pyi")
+        pure_pypi_paths = [
+            remove_intersection_path(self.src_path, item) for item in pyi_files
+        ]
+        self.__copy(pure_pypi_paths, self.src_path, self.build_path)
+
+        return pure_pypi_paths
 
     def clean_up(self):
         build_abspath = self.build_path.resolve().absolute()
