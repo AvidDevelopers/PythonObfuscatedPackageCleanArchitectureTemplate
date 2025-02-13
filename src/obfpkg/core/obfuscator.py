@@ -6,9 +6,12 @@ from pathlib import Path
 import shutil
 
 obf_cmds = [
-    "pyarmor init --src {src_pkg} --entry __init__.py config",
-    "pyarmor build --platform windows.x86_64 --platform linux.x86_64 --platform darwin.x86_64 --output dist --only-runtime config",
-    "pyarmor build --output dist --no-runtime config",
+    # pyarmor 6.6.2
+    # "pyarmor init --src {src_pkg} --entry __init__.py config",
+    # "pyarmor build --platform windows.x86_64 --platform linux.x86_64 --platform darwin.x86_64 --output dist --only-runtime config",
+    # "pyarmor build --output dist --no-runtime config",
+    # pyarmor 9.0.7
+    "pyarmor gen --platform windows.x86_64 --platform linux.x86_64 -O dist -i {src_pkg}"
 ]
 
 
@@ -32,23 +35,23 @@ class Obfuscate:
 
         self.obf_pkg_path = obf_build_path / "dist"
 
-    def correct_path(self):
-        package_init_path = self.obf_pkg_path / self.package_name / "__init__.py"
-        with open(package_init_path) as init:
-            lines = init.readlines()
-            lines.pop(0)
-            lines.insert(0, "from .pytransform import pyarmor_runtime\n")
+    # def correct_path(self):
+    #     package_init_path = self.obf_pkg_path / self.package_name / "__init__.py"
+    #     with open(package_init_path) as init:
+    #         lines = init.readlines()
+    #         lines.pop(0)
+    #         lines.insert(0, "from .pytransform import pyarmor_runtime\n")
 
-        with open(package_init_path, "w") as init:
-            init.writelines(lines)
+    #     with open(package_init_path, "w") as init:
+    #         init.writelines(lines)
 
-    def relocate_pytransform(self):
-        pytransform_path = self.obf_pkg_path / "pytransform"
-        res = shutil.move(
-            f"{pytransform_path}", f"{self.obf_pkg_path / self.package_name}"
-        )
-        if res:
-            self.correct_path()
+    # def relocate_pytransform(self):
+    #     pytransform_path = self.obf_pkg_path / "pytransform"
+    #     res = shutil.move(
+    #         f"{pytransform_path}", f"{self.obf_pkg_path / self.package_name}"
+    #     )
+    #     if res:
+    #         self.correct_path()
 
     def build(self):
         processes: List[Popen] = []
@@ -74,7 +77,7 @@ class Obfuscate:
                 print(err.decode("utf-8"))
 
         if all([p.returncode == 0 for p in processes]):
-            self.relocate_pytransform()
+            # self.relocate_pytransform()
             self.copy_setup_files_from_src()
             print(f"###  The obfuscate project generated successfully!")
 
