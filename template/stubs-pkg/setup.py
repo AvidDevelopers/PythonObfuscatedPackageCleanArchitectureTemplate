@@ -16,5 +16,5 @@ setup(
     long_description=f"{packages_name} package",
     packages=[x for x in packages],
     include_package_data=True,  # Important
-    python_requires=">=3.8,<3.11",
+    python_requires="~=3.11",
 )

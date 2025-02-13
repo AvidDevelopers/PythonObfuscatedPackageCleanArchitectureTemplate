@@ -71,6 +71,7 @@ def rewrite_manifest(path: Path):
     lines = [
         "\nglobal-include  *.pyi",  # important for stubs package",
         "\nrecursive-include */pytransform *",  # important for obfuscate package",
+        "\nrecursive-include */pyarmor_runtime_000000 *",  # important for obfuscate package",
     ]
     must_write_lines = []
     try:

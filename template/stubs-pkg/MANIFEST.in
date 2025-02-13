@@ -1,3 +1,5 @@
 
 global-include  *.pyi
 recursive-include */pytransform *
+recursive-include */pyarmore_runtime* *
+recursive-include */pyarmor_runtime_000000 *

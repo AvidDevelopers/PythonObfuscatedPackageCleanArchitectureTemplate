@@ -8,5 +8,5 @@ setup(
     version=version,
     packages=find_namespace_packages(),
     include_package_data=True,  # Importants
-    python_requires="~=3.8",
+    python_requires="~=3.11",
 )
